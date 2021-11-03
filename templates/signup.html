@@ -6,6 +6,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+        integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    f
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
     <!-- Optional JavaScript -->
     <!-- jQuery and Bootstrap Bundle (includes Popper) -->
@@ -13,7 +20,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
         crossorigin="anonymous"></script>
-     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     
     <script>
         let flag = 0;
@@ -130,47 +138,40 @@
         }
 
     </script>
-    <style>
-        * {
-            font-family: "Stylish", sans-serif;
-        }
 
-        #post-box {
-            width: 500px;
-            margin: 20px auto;
-            padding: 50px;
-        }
-    </style>
     <title> 육아좀 도와주세요ㅜㅜ | 회원가입 </title>
 </head>
 
 <body>
-    {% include './components/header/index.html' %}
+
     <div class="wrap">
-        <div id="post-box">
-            <main class="sign_wrap">
-                <div class="title-container">
-                    <h3>{{title}}</h3>
-                </div>
-                <div>
-                    <input id="input_id" class="input columns is-medium is-gapless" type="text"
-                        placeholder="이름을 입력해주세요.">
-                    <input id="input_password1" class="input columns is-medium is-gapless" type="password"
-                        placeholder="비밀번호 (영문/숫자/특수문자, 8-20자)">
-                    <input id="input_password2" class="input columns is-medium is-gapless" type="password"
-                        placeholder="비밀번호 확인">
-                    <p>
-                        <input id="input_phonenmb" class="input columns is-medium is-gapless" type="text"
-                            placeholder="(-)를 포함한 휴대폰번호를입력해주세요.">
-                        <button id="checkup_phonenmb" class="button columns is-medium is-gapless"
-                            style="margin-bottom: 1.5rem; margin-left: 1.5rem;" onclick="checkUp()">중복확인</button>
-                    </p>
-                    <input id="input_address" class="input columns is-medium is-gapless" type="text"
-                        placeholder="주소를 입력해주세요.">
-                    <p></p>
-                </div>
-                <button class="button is-info is-medium is-fullwidth" onclick="signUp()">회원가입</button>
-            </main>
+        <div class="jumbotron">
+            {% include './components/header/index.html' %}
+            <div id="post-box">
+                <main class="sign_wrap">
+                    <div class="title-container">
+                        <h3>{{title}}</h3>
+                    </div>
+                    <div>
+                        <input id="input_id" class="input columns is-medium is-gapless" type="text"
+                            placeholder="이름을 입력해주세요.">
+                        <input id="input_password1" class="input columns is-medium is-gapless" type="password"
+                            placeholder="비밀번호 (영문/숫자/특수문자, 8-20자)">
+                        <input id="input_password2" class="input columns is-medium is-gapless" type="password"
+                            placeholder="비밀번호 확인">
+                        <p>
+                            <input id="input_phonenmb" class="input columns is-medium is-gapless" type="text"
+                                placeholder="(-)를 포함한 휴대폰번호를입력해주세요.">
+                            <button id="checkup_phonenmb" class="button columns is-medium is-gapless"
+                                style="margin-bottom: 1.5rem; margin-left: 1.5rem;" onclick="checkUp()">중복확인</button>
+                        </p>
+                        <input id="input_address" class="input columns is-medium is-gapless" type="text"
+                            placeholder="주소를 입력해주세요.">
+                        <p></p>
+                    </div>
+                    <button class="button is-info is-medium is-fullwidth" onclick="signUp()">회원가입</button>
+                </main>
+            </div>
         </div>
     </div>
     {% include './components/footer/index.html' %}

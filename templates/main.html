@@ -1,0 +1,598 @@
+<!Doctype html>
+<html lang="ko">
+
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+        integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+        crossorigin="anonymous">
+        
+			  <!-- JS -->
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+            crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+            integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+            crossorigin="anonymous"></script>
+
+            <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+        <!-- 구글폰트 -->
+        <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+
+        <title>SW사관학교 정글 | 나홀로 메모장 였던 것</title>
+
+        <!-- style -->
+        <style type="text/css">
+            * {
+                font-family: "Stylish", sans-serif;
+            }
+
+            .wrap {
+                width: 900px;
+                margin: auto;
+            }
+
+            .comment {
+                color: blue;
+                font-weight: bold;
+            }
+
+            .display-4 {
+                text-align: center;
+            }
+
+            .jumbotron {
+                background-color: #ffe5f4;
+            }
+
+            #post-box {
+                width: 500px;
+                margin: 20px auto;
+                padding: 50px;
+            }
+
+        </style>
+        <script>
+            $(document).ready(function () {
+                $("#cards-box").html("");
+                showArticles();
+            }); 
+
+            function openCloseSitter(index) {
+                // id 값 post-box의 display 값이 block 이면(= 눈에 보이면)
+                if ($("#card-chooseBox"+index).css("display") == "block") {
+                    // post-box를 가리고
+                    $("#card-chooseBox"+index).hide();
+                    // 다시 버튼을 클릭하면, 박스 열기를 할 수 있게 텍스트 바꿔두기
+                    //$("#sitter").text("닫기");
+                } else {
+                    // 아니면(눈에 보이지 않으면) post-box를 펴라
+                    $("#card-chooseBox"+index).show();
+                    // 다시 버튼을 클릭하면, 박스 닫기를 할 수 있게 텍스트 바꿔두기
+                    //$("#btn-post-box"+index).text("포스팅 박스 닫기");
+                }
+            }
+
+            function choose(index){
+                let name = "gitddabong"
+                
+                $.ajax({
+                    type: "POST", 
+                    url: "/accept", 
+                    data: {
+                        name_give: name, 
+                    }, // 데이터를 주는 방법
+                    success: function (response) { // 성공하면
+                        if (response["result"] == "success") {
+                            alert("포스팅 성공!");
+                            // 3. 성공 시 페이지 새로고침하기
+                            window.location.reload();
+                        } else {
+                            alert("서버 오류!")
+                        }
+                    } 
+                })
+            }
+
+            function updateOpen(index) {
+                if ($("#card-update"+index).css("display") == "block") {
+                    $("#card-update"+index).hide()
+                    $("#card-body"+index).show()
+                } else {
+                    $("#card-update"+index).show()
+                    $("#card-body"+index).hide()
+                    $("#card-chooseBox"+index).hide()
+                }
+            }
+
+            function updateArticle(index) {
+                let writter='gitddabong'       //로그인 구현 전에 임시로 사용
+
+                let documentId = document.getElementById("card-documentId"+index).value
+                let title = $("#update-title").val()
+                let target = document.getElementById("update-start-month")
+                let startMonth = target.options[target.selectedIndex].text
+                target = document.getElementById("update-start-day")
+                let startDay = target.options[target.selectedIndex].text
+                target = document.getElementById("update-start-hour")
+                let startHour = target.options[target.selectedIndex].text
+                target = document.getElementById("update-end-hour")
+                let endHour = target.options[target.selectedIndex].text
+                let comment = $("#update-comment").val()
+
+                $.ajax({
+                    type: "POST", 
+                    url: "/update", 
+                    data: {
+                        writter_give: writter,
+                        documentId_give: documentId,
+                        update_title_give: title, 
+                        update_startMonth_give: startMonth, 
+                        update_startDay_give: startDay, 
+                        update_startHour_give: startHour, 
+                        update_endHour_give: endHour, 
+                        update_comment_give: comment
+                    }, // 데이터를 주는 방법
+                    success: function (response) { // 성공하면
+                        if (response["result"] == "success") {
+                            alert("수정 성공!");
+                            // 3. 성공 시 페이지 새로고침하기
+                            window.location.reload();
+                        } else {
+                            alert("서버 오류!")
+                        }
+                    } 
+                })
+            }
+
+
+            function postArticle() {
+                let writter='gitddabong'       //로그인 구현 전에 임시로 사용
+
+                let title = $("#post-title").val()
+                let target = document.getElementById("start-month")
+                let startMonth = target.options[target.selectedIndex].text
+                target = document.getElementById("start-day")
+                let startDay = target.options[target.selectedIndex].text
+                target = document.getElementById("start-hour")
+                let startHour = target.options[target.selectedIndex].text
+                target = document.getElementById("end-hour")
+                let endHour = target.options[target.selectedIndex].text
+                let comment = $("#post-comment").val()
+
+                $.ajax({
+                    type: "POST", 
+                    url: "/memo", 
+                    data: {
+                        writter_give: writter,
+                        title_give: title, 
+                        startMonth_give: startMonth, 
+                        startDay_give: startDay, 
+                        startHour_give: startHour, 
+                        endHour_give: endHour, 
+                        comment_give: comment
+                    }, // 데이터를 주는 방법
+                    success: function (response) { // 성공하면
+                        if (response["result"] == "success") {
+                            alert("포스팅 성공!");
+                            // 3. 성공 시 페이지 새로고침하기
+                            window.location.reload();
+                        } else {
+                            alert("서버 오류!")
+                        }
+                    } 
+                })
+            }
+
+            function showArticles() {
+                $.ajax({
+                    type: "GET",
+                    url: "/memo",
+                    data: {},
+                    success: function (response) {
+                        let articles = response["articles"];
+                        console.log(articles);
+                        for (let i = 0; i < articles.length; i++) {
+                            makeCard(
+                                i,
+                                articles[i]["_id"],
+                                articles[i]["title"],
+                                articles[i]["comment"],
+                                articles[i]["startMonth"],
+                                articles[i]["startDay"], 
+                                articles[i]["startHour"],
+                                articles[i]["endHour"]
+                            );
+                        }
+                        
+                    }
+                })
+            }
+
+            function makeCard(index,documentId ,title, comment, startMonth, startDay, startHour, endHour) {
+                let tempHtml = `
+                <div class="card" id="card${index}">
+                    <input type="hidden" id="card-documentId${index}" value="${documentId}">
+                    <div class="card-body" id="card-body${index}">
+                        <p class="card-text title">${title}</p>
+                        <p class="card-text time">${startMonth}월 ${startDay}일 ${startHour}시부터 ${endHour}시까지</p>
+                        <p class="card-text comment">${comment}</p>
+    
+                        <button type="button" onclick="" class="btn btn-sm btn-secondary">수락</button>
+                        <button id="sitter" type="button" onclick="openCloseSitter(${index})" class="btn btn-dark" >보모 희망자</button>
+                        <button type="button" onclick="updateOpen(${index})" class="btn btn-dark" >수정</button>
+                    </div>
+                    <div id="card-chooseBox${index}" style="display: none">
+                        반복문으로 라디오버튼 만들기
+                        <button type="button" onclick="choose(${index})" class="btn btn-dark" >선택</button>
+                    </div>
+                    <div class="card-update" id="card-update${index}" style="display: none;">
+                        <input type="text" id="update-title" placeholder="제목" value="${title}">
+                        <div class="form-group">
+                            <select id="update-start-month">
+                                <option value="">1</option>
+                                <option value="">2</option>
+                                <option value="">3</option>
+                                <option value="">4</option>
+                                <option value="">5</option>
+                                <option value="">6</option>
+                                <option value="">7</option>
+                                <option value="">8</option>
+                                <option value="">9</option>
+                                <option value="">10</option>
+                                <option value="">11</option>
+                                <option value="">12</option>
+                            </select>
+                            월
+    
+                            <select id="update-start-day">
+                                <option value="">1</option>
+                                <option value="">2</option>
+                                <option value="">3</option>
+                                <option value="">4</option>
+                                <option value="">5</option>
+                                <option value="">6</option>
+                                <option value="">7</option>
+                                <option value="">8</option>
+                                <option value="">9</option>
+                                <option value="">10</option>
+                                <option value="">11</option>
+                                <option value="">12</option>
+                                <option value="">13</option>
+                                <option value="">14</option>
+                                <option value="">15</option>
+                                <option value="">16</option>
+                                <option value="">17</option>
+                                <option value="">18</option>
+                                <option value="">19</option>
+                                <option value="">20</option>
+                                <option value="">21</option>
+                                <option value="">22</option>
+                                <option value="">23</option>
+                                <option value="">24</option>
+                                <option value="">25</option>
+                                <option value="">26</option>
+                                <option value="">27</option>
+                                <option value="">28</option>
+                                <option value="">29</option>
+                                <option value="">30</option>
+                                <option value="">31</option>
+                            </select>
+                            일
+    
+                            <select id="update-start-hour">
+                                <option value="">7</option>
+                                <option value="">8</option>
+                                <option value="">9</option>
+                                <option value="">10</option>
+                                <option value="">11</option>
+                                <option value="">12</option>
+                                <option value="">13</option>
+                                <option value="">14</option>
+                                <option value="">15</option>
+                                <option value="">16</option>
+                                <option value="">17</option>
+                                <option value="">18</option>
+                                <option value="">19</option>
+                                <option value="">20</option>
+                            </select>
+                            시 부터 
+                            <select id="update-end-hour">
+                                <option value="">7</option>
+                                <option value="">8</option>
+                                <option value="">9</option>
+                                <option value="">10</option>
+                                <option value="">11</option>
+                                <option value="">12</option>
+                                <option value="">13</option>
+                                <option value="">14</option>
+                                <option value="">15</option>
+                                <option value="">16</option>
+                                <option value="">17</option>
+                                <option value="">18</option>
+                                <option value="">19</option>
+                                <option value="">20</option>
+                            </select>
+                            까지
+                        </div>
+                        <div class="form-group">
+                            <textarea id="update-comment" class="form-control" rows="2">${comment}</textarea>
+                        </div>
+                        <div>
+                            <button type="button" onclick="updateArticle(${index})" class="btn btn-sm btn-secondary">저장</button>
+                            <button type="button" onclick="updateOpen(${index})" class="btn btn-sm btn-secondary">취소</button>
+                        </div>
+                </div>`;
+                $("#cards-box").append(tempHtml);
+            }
+        </script>
+
+    </head>
+
+    <body>
+        <div class="wrap">
+            <div class="jumbotron">
+                <h1 class="display-4">육아 좀 도와주세요~</h1>
+               
+                <div id="post-box">
+                    <div class="form-group">
+                        <label for="post-title">제목</label>
+                        <input id="post-title" class="form-control" placeholder="">
+                    </div>
+                    <div class="form-group">
+                        <label for="post-times">위탁 시간</label>
+                        <select id="start-month">
+                            <option value="">1</option>
+                            <option value="">2</option>
+                            <option value="">3</option>
+                            <option value="">4</option>
+                            <option value="">5</option>
+                            <option value="">6</option>
+                            <option value="">7</option>
+                            <option value="">8</option>
+                            <option value="">9</option>
+                            <option value="">10</option>
+                            <option value="">11</option>
+                            <option value="">12</option>
+                        </select>
+                        월
+
+                        <select id="start-day">
+                            <option value="">1</option>
+                            <option value="">2</option>
+                            <option value="">3</option>
+                            <option value="">4</option>
+                            <option value="">5</option>
+                            <option value="">6</option>
+                            <option value="">7</option>
+                            <option value="">8</option>
+                            <option value="">9</option>
+                            <option value="">10</option>
+                            <option value="">11</option>
+                            <option value="">12</option>
+                            <option value="">13</option>
+                            <option value="">14</option>
+                            <option value="">15</option>
+                            <option value="">16</option>
+                            <option value="">17</option>
+                            <option value="">18</option>
+                            <option value="">19</option>
+                            <option value="">20</option>
+                            <option value="">21</option>
+                            <option value="">22</option>
+                            <option value="">23</option>
+                            <option value="">24</option>
+                            <option value="">25</option>
+                            <option value="">26</option>
+                            <option value="">27</option>
+                            <option value="">28</option>
+                            <option value="">29</option>
+                            <option value="">30</option>
+                            <option value="">31</option>
+                        </select>
+                        일
+
+                        <select id="start-hour">
+                            <option value="">7</option>
+                            <option value="">8</option>
+                            <option value="">9</option>
+                            <option value="">10</option>
+                            <option value="">11</option>
+                            <option value="">12</option>
+                            <option value="">13</option>
+                            <option value="">14</option>
+                            <option value="">15</option>
+                            <option value="">16</option>
+                            <option value="">17</option>
+                            <option value="">18</option>
+                            <option value="">19</option>
+                            <option value="">20</option>
+                        </select>
+                        시 부터 
+                        <select id="end-hour">
+                            <option value="">7</option>
+                            <option value="">8</option>
+                            <option value="">9</option>
+                            <option value="">10</option>
+                            <option value="">11</option>
+                            <option value="">12</option>
+                            <option value="">13</option>
+                            <option value="">14</option>
+                            <option value="">15</option>
+                            <option value="">16</option>
+                            <option value="">17</option>
+                            <option value="">18</option>
+                            <option value="">19</option>
+                            <option value="">20</option>
+                        </select>
+                        까지
+                    </div>
+                    <div class="form-group">
+                        <label for="post-comment">육아 주의사항</label>
+                        <textarea id="post-comment" class="form-control" rows="2"></textarea>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="postArticle()">등록하기</button>
+                </div>
+            </div>
+            <div id="cards-box" class="card-columns">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-text title">제목이 들어갑니다.</p>
+                        <p class="card-text comment">여기에 코멘트가 들어갑니다.</p>
+                    </div>
+                    <div>
+                        <button type="button" onclick="amend('${_id}')" class="btn btn-sm btn-secondary">수정</button>
+                        <button type="button" onclick="deletememo('${_id}')" class="btn btn-dark">삭제</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-text title">제목</p>
+                        <p class="card-text time">몇월 며칠 몇시부터 몇시까지</p>
+                        <p class="card-text comment">주의사항</p>
+                    </div>
+                    <div>
+                        <button type="button" onclick="" class="btn btn-sm btn-secondary" >수락</button>
+                        <button id="sitter" type="button" onclick="openClose()" class="btn btn-dark" >보모 희망자</button>
+                        <button type="button" onclick="" class="btn btn-dark" >수정</button>
+                    </div>
+                    <div class="card-chooseBox" style="display: none;">
+                        반복문으로 라디오버튼 만들기
+                        <button type="button" onclick="" class="btn btn-dark" >선택</button>
+                    </div>
+                    <div class="card-update" style="display: none;">
+                        <input type="text" id="update-title" placeholder="제목">
+                        <div class="form-group">
+                            <select id="update-start-month">
+                                <option value="">1</option>
+                                <option value="">2</option>
+                                <option value="">3</option>
+                                <option value="">4</option>
+                                <option value="">5</option>
+                                <option value="">6</option>
+                                <option value="">7</option>
+                                <option value="">8</option>
+                                <option value="">9</option>
+                                <option value="">10</option>
+                                <option value="">11</option>
+                                <option value="">12</option>
+                            </select>
+                            월
+    
+                            <select id="update-start-day">
+                                <option value="">1</option>
+                                <option value="">2</option>
+                                <option value="">3</option>
+                                <option value="">4</option>
+                                <option value="">5</option>
+                                <option value="">6</option>
+                                <option value="">7</option>
+                                <option value="">8</option>
+                                <option value="">9</option>
+                                <option value="">10</option>
+                                <option value="">11</option>
+                                <option value="">12</option>
+                                <option value="">13</option>
+                                <option value="">14</option>
+                                <option value="">15</option>
+                                <option value="">16</option>
+                                <option value="">17</option>
+                                <option value="">18</option>
+                                <option value="">19</option>
+                                <option value="">20</option>
+                                <option value="">21</option>
+                                <option value="">22</option>
+                                <option value="">23</option>
+                                <option value="">24</option>
+                                <option value="">25</option>
+                                <option value="">26</option>
+                                <option value="">27</option>
+                                <option value="">28</option>
+                                <option value="">29</option>
+                                <option value="">30</option>
+                                <option value="">31</option>
+                            </select>
+                            일
+    
+                            <select id="update-start-hour">
+                                <option value="">7</option>
+                                <option value="">8</option>
+                                <option value="">9</option>
+                                <option value="">10</option>
+                                <option value="">11</option>
+                                <option value="">12</option>
+                                <option value="">13</option>
+                                <option value="">14</option>
+                                <option value="">15</option>
+                                <option value="">16</option>
+                                <option value="">17</option>
+                                <option value="">18</option>
+                                <option value="">19</option>
+                                <option value="">20</option>
+                            </select>
+                            시 부터 
+                            <select id="update-end-hour">
+                                <option value="">7</option>
+                                <option value="">8</option>
+                                <option value="">9</option>
+                                <option value="">10</option>
+                                <option value="">11</option>
+                                <option value="">12</option>
+                                <option value="">13</option>
+                                <option value="">14</option>
+                                <option value="">15</option>
+                                <option value="">16</option>
+                                <option value="">17</option>
+                                <option value="">18</option>
+                                <option value="">19</option>
+                                <option value="">20</option>
+                            </select>
+                            까지
+                        </div>
+                        <div class="form-group">
+                            <textarea id="update-comment" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div>
+                            <button type="button" onclick="updateArticle()" class="btn btn-sm btn-secondary">저장</button>
+                            <button type="button" onclick="updateOpen()" class="btn btn-sm btn-secondary">취소</button>
+                        </div>
+    
+
+
+                    </div>
+
+
+
+                </div>
+
+
+
+
+                {% for result in results %}
+                {% set i = 1 %}
+                <div class="card" id="card">
+                    <div class="card-body">
+                        <p class="card-text title">{{ result['title'] }}</p>
+                        <p class="card-text comment">{{ result['startMonth'] }}월 {{ result['startDay'] }}일 {{ result['startHour'] }}시부터 {{ result['endHour'] }}시까지</p>
+                        <p class="card-text comment">{{ result['comment'] }}</p>
+                    </div>
+                    <div>
+                        <button type="button" onclick="" class="btn btn-sm btn-secondary">수락</button>
+                        <button type="button" onclick="openClose()" class="btn btn-dark" >보모 희망자</button>
+                        <button type="button" onclick="" class="btn btn-dark">수정</button>
+                    </div>
+                    <div id="card-chooseBox" style="display: none">
+                        반복문으로 라디오버튼 만들기
+                        <button type="button" onclick="choose()" class="btn btn-dark" >선택</button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </body>
+</html>

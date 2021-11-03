@@ -82,10 +82,11 @@ def sign_in_user():
     id_receive = request.form['id_give']
     password_receive = request.form['password_give']
     password_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
+
     print(password_hash)
     print(id_receive)
     result = db.users.find_one({'username': id_receive, 'password': password_hash})
-    
+ ## 토큰 발행 ##   
     if result is not None :
         payload = {
             'ID': id_receive,

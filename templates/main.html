@@ -96,6 +96,38 @@
                 })
             }
 
+            function chooseSitter(index) {
+
+                let sitter=""
+                    
+                const sitterNodeList = document.getElementsByName('sitter'+index);
+                sitterNodeList.forEach((node) => {
+                    if(node.checked)  {
+                    sitter = node.value;
+                    }
+                }) 
+                let documentId = document.getElementById("card-documentId"+index).value
+
+                $.ajax({
+                    type: "POST", 
+                    url: "/choose", 
+                    data: {
+                        sitter_give: sitter,
+                        documentId_give: documentId
+                    },
+                    success: function (response) {
+                        if (response["result"] == "success") {
+                            alert("보모를 선택하셨습니다!");
+                            window.location.reload();
+                        } else {
+                            alert("서버 오류!")
+                        }
+                    } 
+                }) 
+                
+            }
+
+
             function updateOpen(index) {
                 if ($("#card-update"+index).css("display") == "block") {
                     $("#card-update"+index).hide()
@@ -216,9 +248,14 @@
                     addTemp += `<p>아직 아무도 수락하지 않았습니다.</p>`
                 } else {
                     for (let i = 0; i < private_data.length; i++) {
-                        addTemp = addTemp+`<label><input type="radio" value="`
-                            +private_data[i].split("/")[0] +`">`+private_data[i].split("/")[0]+`  `+private_data[i].split("/")[1]+`</label>`
+                        let name = private_data[i].split("/")[0]
+                        let phnumber = private_data[i].split("/")[1]
+
+                        addTemp = addTemp+`<label><input type="radio" name="sitter${index}" value="`
+                            +name+"/"+phnumber+`">`+name+`  `+phnumber+`</label>`
                     }
+                    addTemp += `<br>
+                        <button type="button" onclick="chooseSitter(${index})" id="choose-button" class="btn btn-dark"" >선택</button>`
                 }
                 
                 let tempHtml = `
@@ -234,8 +271,8 @@
                         <button type="button" onclick="updateOpen(${index})" class="btn btn-dark" >수정</button>
                     </div>
                     <div id="card-chooseBox${index}" style="display: none">`
-                        + addTemp
-                        + `<button type="button" onclick="accept(${index})" class="btn btn-dark" >선택</button>
+                        + addTemp + 
+                        `
                     </div>
                     <div class="card-update" id="card-update${index}" style="display: none;">
                         <input type="text" id="update-title" placeholder="제목" value="${title}">

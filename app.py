@@ -3,15 +3,55 @@ import requests
 from bs4 import BeautifulSoup
 from pymongo import MongoClient 
 from bson.objectid import ObjectId
+# sw import
+import jwt, hashlib, datetime
+import threading
+# sw import
 
 
 app = Flask(__name__)
+SECRET_KEY = 'jungle_kids'
+
 
 client = MongoClient('localhost', 27017)
 db = client.dbkids
 
+### 회원 가입 기능 구현 ###
+@app.route('/sign_up', methods=['GET'])
+def sing_up():
+    return render_template('signup.html', title ='회원가입')
+
+### 회원가입 페이지에서 입력시###
+@app.route('/sign_up', methods=['POST'])
+def sign_up_save():
+    # 회원 가입 시 받을 정보 3가지 id=사용자실명
+    id_receive = request.form['id_give']
+    password_receive = request.form['password_give']
+    phonenmb_receive = request.form['phonenmb_give']
+
+    # password의 경우 보안을 위해 hash 처리
+    password_hash = hashlib.sha256(password_receive.encode('utf-8')).hexdigest()
+    phonenmb_hash = hashlib.sha256(phonenmb_receive.encode('utf-8')).hexdigest()
+
+    user_data = {
+        'username': id_receive,
+        'password': password_hash,
+        'phonenmb': phonenmb_receive
+    }
+
+    db.users.insert_one(user_data)
+    return jsonify({'result': 'success'})
+
+
+@app.route('/check_up', methods=['POST'])
+def check_up():
+    email_receive = request.form['email_give']
+    duplicate = bool(db.users.find_one({'email': email_receive}))
+    return jsonify({'result': 'success', 'duplicate':duplicate})
+
 @app.route('/')
 def home():
+    
     db.boyuk_requests.delete_one
 
     return render_template('main.html')

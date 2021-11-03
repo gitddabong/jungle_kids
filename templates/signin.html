@@ -58,7 +58,6 @@
                     if (response["result"] == "success") {
                         alert('육아를 도와주세요~ 를 방문하셨습니다.')
                         $.cookie('mytoken', response['token'], { path: '/' });
-                        console.log(mytoken)
                         window.location.replace('/');
                     } else {
                         alert(response['message'])

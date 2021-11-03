@@ -19,7 +19,8 @@ db = client.dbkids
 @app.route('/')
 def home():
     token_receive = request.cookies.get('mytoken')
-    print(token_receive)
+    print(type(token_receive))
+    
     if token_receive is not None :
         token_receive = bytes(token_receive[2:-1].encode('ascii'))
         print(token_receive)

@@ -19,13 +19,14 @@ db = client.dbkids
 @app.route('/')
 def home():
     token_receive = request.cookies.get('mytoken')
+    print(token_receive)
     if token_receive is not None :
         token_receive = bytes(token_receive[2:-1].encode('ascii'))
-
+        print(token_receive)
         try:
             payload= jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-            user_info = db.users.find_one({'email': payload['ID']})
-            return render_template('index.html', user_info=user_info)
+            user_info = db.users.find_one({'username': payload['ID']})
+            return render_template('main.html', user_info=user_info)
         except jwt.ExpiredSignatureError:
             return redirect(url_for('/sign_in', message = "로그인 시간이 만료되었습니다."))
     else :
@@ -87,7 +88,6 @@ def sign_in_user():
     if result is not None :
         payload = {
             'ID': id_receive,
-            'PHONE': result['phonenmb'],
             'EXP': str(datetime.datetime.utcnow() + datetime.timedelta(seconds = 60 * 60 * 24))
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')

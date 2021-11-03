@@ -27,7 +27,6 @@
         crossorigin="anonymous"></script>
     <script type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
 
     <script>
@@ -59,6 +58,7 @@
                     if (response["result"] == "success") {
                         alert('육아를 도와주세요~ 를 방문하셨습니다.')
                         $.cookie('mytoken', response['token'], { path: '/' });
+                        console.log(mytoken)
                         window.location.replace('/');
                     } else {
                         alert(response['message'])
@@ -89,7 +89,7 @@
         <main class="sign_wrap">
             <div id="post-box">
                 <div class="title-container">
-                    <h3 width="center">{{title}}</h3>
+                    <h3>{{title}}</h3>
                 </div>
                 <div>
                     <input id="input_id" class="input columns is-medium is-gapless" type="text"

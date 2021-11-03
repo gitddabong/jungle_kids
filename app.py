@@ -2,6 +2,7 @@ from flask import Flask, render_template, jsonify, request
 import requests
 from bs4 import BeautifulSoup
 from pymongo import MongoClient 
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 
@@ -10,46 +11,80 @@ db = client.dbkids
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('main.html')
 
 @app.route('/memo', methods=['POST'])
 def post_article():
-    '''
-    # 1. 클라이언트로부터 데이터를 받기
-    url_receive = request.form['url_give']  # 클라이언트로부터 url을 받는 부분
-    comment_receive = request.form['comment_give']  # 클라이언트로부터 comment를 받는 부분
+    writter_receive = request.form['writter_give']
+    title_receive = request.form['title_give']
+    startMonth_receive = request.form['startMonth_give']
+    startDay_receive = request.form['startDay_give']
+    startHour_receive = request.form['startHour_give']
+    endHour_receive = request.form['endHour_give']
+    comment_receive = request.form['comment_give']
+    boyuk_requests = {
+        'writter': writter_receive,
+        'title': title_receive, 
+        'startMonth': startMonth_receive, 
+        'startDay': startDay_receive, 
+        'startHour': startHour_receive, 
+        'endHour': endHour_receive, 
+        'comment': comment_receive
+    }
 
-    # 2. meta tag를 스크래핑하기
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36'}
-    data = requests.get(url_receive, headers=headers)
-    soup = BeautifulSoup(data.text, 'html.parser')
+    db.boyuk_requests.insert_one(boyuk_requests)
+    return jsonify({'result': 'success'})
 
-    og_image = soup.select_one('meta[property="og:image"]')
-    og_title = soup.select_one('meta[property="og:title"]')
-    og_description = soup.select_one('meta[property="og:description"]')
+@app.route('/update', methods=['POST'])
+def update_article():
+    writter_receive = request.form['writter_give']
+    documentId_receive = request.form['documentId_give']
+    title_receive = request.form['update_title_give']
+    startMonth_receive = request.form['update_startMonth_give']
+    startDay_receive = request.form['update_startDay_give']
+    startHour_receive = request.form['update_startHour_give']
+    endHour_receive = request.form['update_endHour_give']
+    comment_receive = request.form['update_comment_give']
 
-    url_title = og_title['content']
-    url_description = og_description['content']
-    url_image = og_image['content']
-
-    article = {'url': url_receive, 'title': url_title, 'desc': url_description, 'image': url_image,
-               'comment': comment_receive}
-
-    # 3. mongoDB에 데이터를 넣기
-    db.articles.insert_one(article)
+    db.boyuk_requests.update_one(
+        {'_id':ObjectId(documentId_receive)},
+        {'$set':{'title':title_receive, 'startMonth':startMonth_receive, 'startDay':startDay_receive, 'startHour':startHour_receive, 'endHour':endHour_receive, 'comment':comment_receive}}
+    )
 
     return jsonify({'result': 'success'})
-    '''
 
 @app.route('/memo', methods=['GET'])
 def read_articles():
-    '''
-    # 1. mongoDB에서 _id 값을 제외한 모든 데이터 조회해오기 (Read)
-    result = list(db.articles.find({}, {'_id': 0}))
-    # 2. articles라는 키 값으로 article 정보 보내주기
+    result = list(db.boyuk_requests.find({}))
+
+    # 클라이언트에서 문서ID를 쉽게 다루기 위해 object타입을 string타입으로 변환
+    for document in result:
+        document['_id'] = str(document['_id'])
+
     return jsonify({'result': 'success', 'articles': result})
-    '''
+
+@app.route('/accept', methods=['POST'])
+def request_accept():
+    private_data_receive = request.form['private_data_give']
+    # 수락을 요청한 사용자의 문서ID를 저장
+    #user_documentId = str(db.users.find_one({'hpnumber':private_data_receive})['_id'])
+
+    documentId_receive = request.form['documentId_give']
+    db.boyuk_requests.update(
+        {'_id':ObjectId(documentId_receive)},
+        { '$push': { 'requests' : { '$each': [private_data_receive] } } }
+    )
+    return jsonify({'result': 'success'})
+
+@app.route('/choose', methods=['POST'])
+def choose_sitter():
+    # 조건은 문서ID로 해야 함
+    sitter_receive = request.form["sitter_give"]
+    documentId_receive = request.form["documentId_give"]
+
+    db.boyuk_requests.update_one({'_id': ObjectId(documentId_receive)}, {'$set': {'sitter' : sitter_receive}})
+
+    return jsonify({'result': 'success'})
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)

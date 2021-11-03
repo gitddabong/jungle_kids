@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <!-- Optional JavaScript -->
+    <!-- jQuery and Bootstrap Bundle (includes Popper) -->
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+        crossorigin="anonymous"></script>
+
+    <script>
+        let flag = 0;
+
+        function signUp() {
+
+            let id = $("#input_id").val();
+            let password1 = $("#input_password1").val();
+            let password2 = $("#input_password2").val();
+            let phonenmb = $("#input_phonenmb").val();
+
+            if (id == "") {
+                alert("성함을 입력해주세요.id 입니다.")
+                $("#input_id").focus()
+                return;
+            }
+
+            if (password1 == "") {
+                alert("Password를 입력해주세요.")
+                $("#input_password1").focus();
+                return;
+            } else if (!check_password(password1)) {
+                alert("Password의 형식을 확인해주세요.")
+                $("#input_password1").focus();
+                return;
+            }
+
+            if (password2 == "") {
+                alert("Password를 다시 입력해주세요.")
+                $("#input_password2").focus();
+                return;
+            } else if (password2 != password1) {
+                alert("Password가 일치하지 않습니다. 다시 입력해주세요.")
+                $("#input_password2").focus();
+                return;
+            }
+
+            if (phonenmb == "") {
+                alert("성함을 입력해주세요.")
+                $("#input_phonenmb").focus()
+                return;
+            } else if (!flag) {
+                alert("전화번호 중복을 확인 수행해주세요.")
+                $("#checkup_phonenmb").focus()
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/sign_up",
+                data: {
+                    id_give: id,
+                    password_give: password1,
+                    phonenb_give: phonenmb
+                },
+                success: function (response) {
+                    if (response["result"] == "success") {
+                        alert("회원 가입이 완료되었습니다.");
+                        window.location.href = '/sign_in';
+                    }
+                }
+            })
+        }
+
+        function check_password(password) {
+            var regExp = /^(?=.*\d)(?=.*[a-zA-Z])[0-9a-zA-Z!@#$%^&*]{8,20}$/;
+            return regExp.test(password);
+        }
+
+        function checkUp() {
+            flag = 1
+            let phonenmb = $("#input_phonenmb").val();
+
+            if (phonenmb == "") {
+                alert("휴대폰번호를 입력해주세요.")
+                $("#input_phonenmb").focus()
+                return;
+            }
+
+            if (!check_phonenmb(phonenmb)) {
+                alert("휴대폰 번호를 확인해주세요")
+                $("#input_phonenmb").focus();
+                return
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/check_up",
+                data: {
+                    phonenmb_give: phonenmb
+                },
+                success: function (response) {
+                    if (response["duplicate"]) {
+                        alert("이미 저장된 전화번호 입니다.")
+                        flag = 0
+                        $("#input_phonenmb").focus();
+                    } else {
+                        alert("사용할 수 있는 전화번호 입니다.")
+                    }
+                }
+            })
+        }
+
+        function check_phonenmb(phonenmb) {
+            var regExp = /^\d{3}-\d{3,4}-\d{4}$/;
+            return regExp.test(phonenmb);
+        }
+
+    </script>
+    <style>
+        * {
+            font-family: "Stylish", sans-serif;
+        }
+
+        #post-box {
+            width: 500px;
+            margin: 20px auto;
+            padding: 50px;
+        }
+    </style>
+    <title> 육아좀 도와주세요ㅜㅜ | 회원가입 </title>
+</head>
+
+<body>
+    {% include './components/header/index.html' %}
+    <div class="wrap">
+        <div id="post-box">
+
+
+            <main class="sign_wrap">
+                <div class="title-container">
+                    <h3>{{title}}</h3>
+                </div>
+                <div>
+                    <input id="input_id" class="input columns is-medium is-gapless" type="text"
+                        placeholder="이름을 입력해주세요.">
+                    <input id="input_password1" class="input columns is-medium is-gapless" type="password"
+                        placeholder="비밀번호 (영문/숫자/특수문자, 8-20자)">
+                    <input id="input_password2" class="input columns is-medium is-gapless" type="password"
+                        placeholder="비밀번호 확인">
+                    <p class="email_container">
+                        <input id="input_phonenmb" class="input columns is-medium is-gapless" type="text"
+                            placeholder="(-)를 포함한 휴대폰번호를입력해주세요.">
+                        <button id="checkup_phonenmb" class="button columns is-medium is-gapless"
+                            style="margin-bottom: 1.5rem; margin-left: 1.5rem;" onclick="checkUp()">중복확인</button>
+                    </p>
+                </div>
+                <button class="button is-info is-medium is-fullwidth" onclick="signUp()">회원가입</button>
+            </main>
+        </div>
+    </div>
+    {% include './components/footer/index.j2' %}
+</body>
+
+</html>

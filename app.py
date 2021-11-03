@@ -29,8 +29,7 @@ def post_article():
         'startDay': startDay_receive, 
         'startHour': startHour_receive, 
         'endHour': endHour_receive, 
-        'comment': comment_receive,
-        'requests': []
+        'comment': comment_receive
     }
 
     db.boyuk_requests.insert_one(boyuk_requests)
@@ -58,6 +57,7 @@ def update_article():
 def read_articles():
     result = list(db.boyuk_requests.find({}))
 
+    # 클라이언트에서 문서ID를 쉽게 다루기 위해 object타입을 string타입으로 변환
     for document in result:
         document['_id'] = str(document['_id'])
 
@@ -65,11 +65,14 @@ def read_articles():
 
 @app.route('/accept', methods=['POST'])
 def request_accept():
-    hpnumber_receive = request.form['hpnumber_give']
+    private_data_receive = request.form['private_data_give']
+    # 수락을 요청한 사용자의 문서ID를 저장
+    #user_documentId = str(db.users.find_one({'hpnumber':private_data_receive})['_id'])
+
     documentId_receive = request.form['documentId_give']
     db.boyuk_requests.update(
         {'_id':ObjectId(documentId_receive)},
-        { '$push': { 'requests' : { '$each': [hpnumber_receive] } } }
+        { '$push': { 'requests' : { '$each': [private_data_receive] } } }
     )
     return jsonify({'result': 'success'})
 

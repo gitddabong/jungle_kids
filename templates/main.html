@@ -64,17 +64,10 @@
             }); 
 
             function openCloseSitter(index) {
-                // id 값 post-box의 display 값이 block 이면(= 눈에 보이면)
                 if ($("#card-chooseBox"+index).css("display") == "block") {
-                    // post-box를 가리고
                     $("#card-chooseBox"+index).hide();
-                    // 다시 버튼을 클릭하면, 박스 열기를 할 수 있게 텍스트 바꿔두기
-                    //$("#sitter").text("닫기");
                 } else {
-                    // 아니면(눈에 보이지 않으면) post-box를 펴라
                     $("#card-chooseBox"+index).show();
-                    // 다시 버튼을 클릭하면, 박스 닫기를 할 수 있게 텍스트 바꿔두기
-                    //$("#btn-post-box"+index).text("포스팅 박스 닫기");
                 }
             }
 
@@ -83,11 +76,13 @@
                 let hpnumber = "01012345678"
                 let documentId = document.getElementById("card-documentId"+index).value
                 
+                let private_data = name + hpnumber
+
                 $.ajax({
                     type: "POST",
                     url: "/accept",
                     data: {
-                        hpnumber_give: hpnumber,
+                        private_data_give: private_data,
                         documentId_give: documentId
                     }, 
                     success: function (response) {
@@ -207,15 +202,25 @@
                                 articles[i]["startMonth"],
                                 articles[i]["startDay"], 
                                 articles[i]["startHour"],
-                                articles[i]["endHour"]
-                            );
+                                articles[i]["endHour"],
+                                articles[i]["requests"]
+                            )
                         }
-                        
                     }
                 })
             }
 
-            function makeCard(index,documentId ,title, comment, startMonth, startDay, startHour, endHour) {
+            function makeCard(index, documentId ,title, comment, startMonth, startDay, startHour, endHour, private_data) {                
+                let addTemp = ""
+                if (private_data.length == 0) {
+                    addTemp += `<p>아직 아무도 수락하지 않았습니다.</p>`
+                } else {
+                    for (let i = 0; i < private_data.length; i++) {
+                        addTemp = addTemp+`<label><input type="radio" value="`
+                            +private_data[i].split("/")[0] +`">`+private_data[i].split("/")[0]+`  `+private_data[i].split("/")[1]+`</label>`
+                    }
+                }
+                
                 let tempHtml = `
                 <div class="card" id="card${index}">
                     <input type="hidden" id="card-documentId${index}" value="${documentId}">
@@ -228,9 +233,9 @@
                         <button id="sitter" type="button" onclick="openCloseSitter(${index})" class="btn btn-dark" >보모 희망자</button>
                         <button type="button" onclick="updateOpen(${index})" class="btn btn-dark" >수정</button>
                     </div>
-                    <div id="card-chooseBox${index}" style="display: none">
-                        반복문으로 라디오버튼 만들기
-                        <button type="button" onclick="accept(${index})" class="btn btn-dark" >선택</button>
+                    <div id="card-chooseBox${index}" style="display: none">`
+                        + addTemp
+                        + `<button type="button" onclick="accept(${index})" class="btn btn-dark" >선택</button>
                     </div>
                     <div class="card-update" id="card-update${index}" style="display: none;">
                         <input type="text" id="update-title" placeholder="제목" value="${title}">

@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 from pymongo import MongoClient 
 from bson.objectid import ObjectId
 
-
 app = Flask(__name__)
 
 client = MongoClient('localhost', 27017)
@@ -12,8 +11,6 @@ db = client.dbkids
 
 @app.route('/')
 def home():
-    db.boyuk_requests.delete_one
-
     return render_template('main.html')
 
 @app.route('/memo', methods=['POST'])
@@ -32,7 +29,8 @@ def post_article():
         'startDay': startDay_receive, 
         'startHour': startHour_receive, 
         'endHour': endHour_receive, 
-        'comment': comment_receive
+        'comment': comment_receive,
+        'requests': []
     }
 
     db.boyuk_requests.insert_one(boyuk_requests)
@@ -61,9 +59,19 @@ def read_articles():
     result = list(db.boyuk_requests.find({}))
 
     for document in result:
-        document['_id']=str(document['_id'])
+        document['_id'] = str(document['_id'])
 
     return jsonify({'result': 'success', 'articles': result})
+
+@app.route('/accept', methods=['POST'])
+def request_accept():
+    hpnumber_receive = request.form['hpnumber_give']
+    documentId_receive = request.form['documentId_give']
+    db.boyuk_requests.update(
+        {'_id':ObjectId(documentId_receive)},
+        { '$push': { 'requests' : { '$each': [hpnumber_receive] } } }
+    )
+    return jsonify({'result': 'success'})
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)

@@ -78,24 +78,26 @@
                 }
             }
 
-            function choose(index){
+            function accept(index){
                 let name = "gitddabong"
+                let hpnumber = "01012345678"
+                let documentId = document.getElementById("card-documentId"+index).value
                 
                 $.ajax({
-                    type: "POST", 
-                    url: "/accept", 
+                    type: "POST",
+                    url: "/accept",
                     data: {
-                        name_give: name, 
-                    }, // 데이터를 주는 방법
-                    success: function (response) { // 성공하면
+                        hpnumber_give: hpnumber,
+                        documentId_give: documentId
+                    }, 
+                    success: function (response) {
                         if (response["result"] == "success") {
-                            alert("포스팅 성공!");
-                            // 3. 성공 시 페이지 새로고침하기
+                            alert("수락 요청이 완료되었습니다!");
                             window.location.reload();
                         } else {
                             alert("서버 오류!")
                         }
-                    } 
+                    }
                 })
             }
 
@@ -196,7 +198,6 @@
                     data: {},
                     success: function (response) {
                         let articles = response["articles"];
-                        console.log(articles);
                         for (let i = 0; i < articles.length; i++) {
                             makeCard(
                                 i,
@@ -223,13 +224,13 @@
                         <p class="card-text time">${startMonth}월 ${startDay}일 ${startHour}시부터 ${endHour}시까지</p>
                         <p class="card-text comment">${comment}</p>
     
-                        <button type="button" onclick="" class="btn btn-sm btn-secondary">수락</button>
+                        <button type="button" onclick="accept(${index})" class="btn btn-sm btn-secondary">수락</button>
                         <button id="sitter" type="button" onclick="openCloseSitter(${index})" class="btn btn-dark" >보모 희망자</button>
                         <button type="button" onclick="updateOpen(${index})" class="btn btn-dark" >수정</button>
                     </div>
                     <div id="card-chooseBox${index}" style="display: none">
                         반복문으로 라디오버튼 만들기
-                        <button type="button" onclick="choose(${index})" class="btn btn-dark" >선택</button>
+                        <button type="button" onclick="accept(${index})" class="btn btn-dark" >선택</button>
                     </div>
                     <div class="card-update" id="card-update${index}" style="display: none;">
                         <input type="text" id="update-title" placeholder="제목" value="${title}">
@@ -570,28 +571,6 @@
 
                 </div>
 
-
-
-
-                {% for result in results %}
-                {% set i = 1 %}
-                <div class="card" id="card">
-                    <div class="card-body">
-                        <p class="card-text title">{{ result['title'] }}</p>
-                        <p class="card-text comment">{{ result['startMonth'] }}월 {{ result['startDay'] }}일 {{ result['startHour'] }}시부터 {{ result['endHour'] }}시까지</p>
-                        <p class="card-text comment">{{ result['comment'] }}</p>
-                    </div>
-                    <div>
-                        <button type="button" onclick="" class="btn btn-sm btn-secondary">수락</button>
-                        <button type="button" onclick="openClose()" class="btn btn-dark" >보모 희망자</button>
-                        <button type="button" onclick="" class="btn btn-dark">수정</button>
-                    </div>
-                    <div id="card-chooseBox" style="display: none">
-                        반복문으로 라디오버튼 만들기
-                        <button type="button" onclick="choose()" class="btn btn-dark" >선택</button>
-                    </div>
-                </div>
-                {% endfor %}
             </div>
         </div>
     </body>

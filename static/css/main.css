@@ -1,0 +1,27 @@
+* {
+    font-family: "Stylish", sans-serif;
+}
+
+.wrap {
+    width: 900px;
+    margin: auto;
+}
+
+.comment {
+    color: blue;
+    font-weight: bold;
+}
+
+.display-4 {
+    text-align: center;
+}
+
+.jumbotron {
+    background-color: #ffe5f4;
+}
+
+#post-box {
+    width: 500px;
+    margin: 20px auto;
+    padding: 50px;
+}

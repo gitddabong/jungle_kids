@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+            <!-- 구글폰트 -->
+            <link href="https://fonts.googleapis.com/css?family=Stylish&display=swap" rel="stylesheet">
+            
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+
+    <script type="text/javascript">        
+        const { pathname } = window.location;
+        const current_pathname = pathname;
+
+        $(document).ready(function() {
+
+            let token = $.cookie("mytoken");
+
+            const signinEle = document.getElementById("signin");
+            const signupEle = document.getElementById("signup");
+
+            if(current_pathname === '/sign_in') {
+                signinEle.style.color = "#42BBFF"
+                signupEle.style.color = "black"
+            } else if (current_pathname === '/sign_up') {
+                signupEle.style.color = "#42BBFF"
+                signinEle.style.color = "black"
+            }
+        })
+
+        $(document).ready(function () {
+            $("#loginOrNot").html("");
+            loginData();
+        })
+
+        function loginData() {
+                let temp_html = "" 
+                let data = $.cookie('mytoken')
+                if (data) {temp_html = `<a id="signout" class="sign_btn signin_btn" onclick="removeToken()"">
+                                                로그아웃
+                                            </a>
+                                           `
+                } else {temp_html = `<a id="signin" class="sign_btn signin_btn" href="/sign_in">
+                                            로그인
+                                        </a>
+                                        <a id="signup" class="sign_btn signup_btn" href="/sign_up">
+                                                회원가입
+                                    </a>`
+                }
+                $("#loginOrNot").append(temp_html);
+                }
+        
+        function removeToken() {
+            $.removeCookie('mytoken', {path: '/'});
+            window.location.href = '/sign_in';
+        }
+    </script>
+    <style type="text/css">
+        * {
+            font-family: "Stylish", sans-serif;
+        }
+    </style>
+
+</head>
+<body>
+    <header>
+        <div class="header_wrap">
+            <h1 class="display-4">육아좀 도와주세요~</h1>
+            <div id="loginOrNot" class="header_anchor_container">
+                <a id="signin" class="sign_btn signin_btn" href="/sign_in">
+                    로그인
+                </a>
+                <a id="signup" class="sign_btn signup_btn" href="/sign_up">
+                    회원가입
+                </a>
+            </div>
+        </div>
+    </header>
+</body>
+</html>

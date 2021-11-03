@@ -7,7 +7,6 @@ from bson.objectid import ObjectId
 import jwt, hashlib, datetime
 # sw import
 
-
 app = Flask(__name__)
 SECRET_KEY = 'jungle_kids'
 
@@ -18,18 +17,21 @@ db = client.dbkids
 
 @app.route('/')
 def home():
-    token_receive = request.cookies.get('mytoken')
+    token_receive = request.cookies.get('mytoken') 
+    print(type(token_receive))
     if token_receive is not None :
+        print("토큰있다") 
         token_receive = bytes(token_receive[2:-1].encode('ascii'))
 
         try:
             payload= jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
             user_info = db.users.find_one({'email': payload['ID']})
-            return render_template('index.html', user_info=user_info)
+            return render_template('main.html', user_info=user_info)
         except jwt.ExpiredSignatureError:
             return redirect(url_for('/sign_in', message = "로그인 시간이 만료되었습니다."))
     else :
-     return render_template('main.html')
+     print("토큰없음") 
+     return render_template('signin.html')
 
 
 ### 회원 가입 기능 구현 ###
